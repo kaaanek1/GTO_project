@@ -1,0 +1,136 @@
+# Custom Widgets
+<StandardItem@BoxLayout>:
+    exercise: ""
+    gold: ""
+    orientation: "horizontal"
+    size_hint_y: None
+    height: "50dp"
+    Label:
+        text: root.exercise
+        size_hint_x: 0.6
+    Label:
+        text: root.gold
+        size_hint_x: 0.4
+        color: 1, 0.84, 0, 1  # золотой цвет
+
+<ProgressItem@BoxLayout>:
+    exercise: ""
+    current: ""
+    best: ""
+    norm: ""
+    orientation: "horizontal"
+    size_hint_y: None
+    height: "50dp"
+    Label:
+        text: root.exercise
+        size_hint_x: 0.4
+    Label:
+        text: str(root.current)
+        size_hint_x: 0.2
+        color: 0, 1, 0, 1 if float(root.current) >= float(root.norm) else (1, 1, 0, 1 if float(root.current) >= float(root.norm)*0.8 else (1, 0, 0, 1))
+    Label:
+        text: str(root.best)
+        size_hint_x: 0.2
+        color: 0, 1, 0, 1 if float(root.best) >= float(root.norm) else (1, 1, 0, 1 if float(root.best) >= float(root.norm)*0.8 else (1, 0, 0, 1))
+    Label:
+        text: str(root.norm)
+        size_hint_x: 0.2
+        color: 1, 0.84, 0, 1
+
+# Main Screens
+<StandardsScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: 10
+        spacing: 10
+        Label:
+            text: "Нормативы ГТО"
+            font_size: 24
+            size_hint_y: 0.1
+        ScrollView:
+            BoxLayout:
+                id: standards_container
+                orientation: "vertical"
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: 5
+        BoxLayout:
+            size_hint_y: 0.15
+            spacing: 10
+            Button:
+                text: "Трекер"
+                on_press: root.manager.current = "tracker"
+            Button:
+                text: "Блокнот"
+                on_press: root.manager.current = "notebook"
+
+<TrackerScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: 10
+        spacing: 10
+        Label:
+            text: "Ваш прогресс"
+            font_size: 24
+            size_hint_y: 0.1
+        GridLayout:
+            cols: 1
+            size_hint_y: 0.1
+            spacing: 5
+            Label:
+                text: "Упражнение | Текущий | Лучший | Норматив"
+                font_size: 14
+                bold: True
+        ScrollView:
+            BoxLayout:
+                id: progress_container
+                orientation: "vertical"
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: 5
+        BoxLayout:
+            size_hint_y: 0.15
+            spacing: 10
+            Button:
+                text: "Нормативы"
+                on_press: root.manager.current = "standards"
+            Button:
+                text: "Блокнот"
+                on_press: root.manager.current = "notebook"
+
+<NotebookScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: 10
+        spacing: 10
+        Label:
+            text: "Блокнот тренировок"
+            font_size: 24
+            size_hint_y: 0.1
+        TextInput:
+            id: exercise_input
+            hint_text: "Упражнение"
+            size_hint_y: 0.1
+        TextInput:
+            id: result_input
+            hint_text: "Результат"
+            input_filter: "float"
+            size_hint_y: 0.1
+        TextInput:
+            id: notes_input
+            hint_text: "Заметки"
+            size_hint_y: 0.5
+        BoxLayout:
+            size_hint_y: 0.2
+            spacing: 10
+            Button:
+                text: "Сохранить"
+                on_press: root.save_entry()
+            Button:
+                text: "Очистить"
+                on_press: root.clear_inputs()
+        BoxLayout:
+            size_hint_y: 0.1
+            Button:
+                text: "Назад"
+                on_press: root.manager.current = "tracker"

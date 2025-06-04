@@ -1,0 +1,525 @@
+<RegistrationScreen>:
+    name: 'registration'  # Важно указать имя экрана
+    name_input: name_input
+    age_input: age_input
+    gender_spinner: gender_spinner
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 30
+        spacing: 15
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 1  # Белый фон
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: 'Регистрация'
+            font_size: 24
+            size_hint_y: None
+            height: 50
+            color: 0, 0, 0, 1  # Чёрный текст
+            bold: True
+
+        TextInput:
+            id: name_input
+            hint_text: 'Ваше имя'
+            size_hint_y: None
+            height: 50
+            foreground_color: 0, 0, 0, 1  # Цвет текста
+            background_color: 0.95, 0.95, 0.95, 1  # Светло-серый фон поля
+            padding: [10, 10]
+
+        TextInput:
+            id: age_input
+            hint_text: 'Ваш возраст'
+            input_filter: 'int'
+            size_hint_y: None
+            height: 50
+            foreground_color: 0, 0, 0, 1
+            background_color: 0.95, 0.95, 0.95, 1
+            padding: [10, 10]
+
+        Spinner:
+            id: gender_spinner
+            text: 'Выберите пол'
+            values: ['Male', 'Female']
+            size_hint_y: None
+            height: 50
+            background_color: 0.95, 0.95, 0.95, 1
+            color: 0, 0, 0, 1
+
+        Button:
+            text: 'Сохранить'
+            size_hint_y: None
+            height: 50
+            background_color: 0.2, 0.6, 1, 1  # Синий цвет кнопки
+            color: 1, 1, 1, 1  # Белый текст
+            bold: True
+            on_press: root.register_user()
+
+<MainScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(10)
+
+        # Заголовок с информацией
+        BoxLayout:
+            size_hint_y: None
+            height: dp(50)
+            orientation: 'horizontal'
+
+            Label:
+                text: root.stage_info
+                font_size: 16
+                bold: True
+                size_hint_x: 0.7
+                halign: 'left'
+
+            Label:
+                text: f"Пол: {root.gender}"
+                font_size: 16
+                size_hint_x: 0.3
+                halign: 'right'
+
+            Button:
+                text: 'Выйти'
+                size_hint_x: 0.3
+                background_color: 1, 0.3, 0.3, 1
+                color: 1, 1, 1, 1
+                on_press: root.logout()
+
+        # Заголовки колонок
+        GridLayout:
+            cols: 5
+            size_hint_y: None
+            height: dp(40)
+            spacing: dp(5)
+            padding: [dp(5), 0]
+            canvas.before:
+                Color:
+                    rgba: 0.2, 0.4, 0.6, 1  # Фон заголовков
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Label:
+                text: 'Упражнение'
+                color: 1, 1, 1, 1
+                bold: True
+                size_hint_x: 0.45
+                halign: 'left'
+
+            Label:
+                text: 'Золото'
+                color: 1, 1, 1, 1
+                bold: True
+                halign: 'center'
+
+            Label:
+                text: 'Серебро'
+                color: 1, 1, 1, 1
+                bold: True
+                halign: 'center'
+
+            Label:
+                text: 'Бронза'
+                color: 1, 1, 1, 1
+                bold: True
+                halign: 'center'
+
+            Label:
+                text: 'Ед.изм.'
+                color: 1, 1, 1, 1
+                bold: True
+                halign: 'right'
+
+        # Таблица с нормативами
+        ScrollView:
+            bar_width: dp(10)
+            RecycleView:
+                id: rv
+                viewclass: 'StandardItem'
+                RecycleGridLayout:
+                    cols: 1
+                    default_size: None, dp(60)
+                    default_size_hint: (1, None)
+                    size_hint_y: None
+                    height: self.minimum_height
+                    spacing: dp(5)
+
+        BoxLayout:
+            size_hint_y: None
+            height: dp(50)
+            spacing: dp(5)
+            padding: [dp(5), dp(5)]
+            canvas.before:
+                Color:
+                    rgba: 0.9, 0.9, 0.9, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Button:
+                text: 'Нормативы'
+                background_normal: ''
+                background_color: 0.2, 0.6, 1, 1
+                color: 1, 1, 1, 1
+                bold: True
+                on_press: root.manager.current = 'main'
+
+            Button:
+                text: 'Калькулятор'
+                background_normal: ''
+                background_color: 0.3, 0.7, 0.3, 1
+                color: 1, 1, 1, 1
+                bold: True
+                on_press: root.manager.current = 'calc'
+
+            Button:
+                text: 'Блокнот'
+                background_normal: ''
+                background_color: 0.8, 0.5, 0.2, 1
+                color: 1, 1, 1, 1
+                bold: True
+                on_press: root.manager.current = 'notebook'
+
+
+<StandardItem>:
+    cols: 5
+    size_hint_y: None
+    height: dp(60)
+    padding: [dp(5), dp(5)]
+    spacing: dp(5)
+
+    canvas.before:
+        Color:
+            rgba: 0.95, 0.95, 0.95, 1  # Или используйте вариант с index, если добавили свойство
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    Label:
+        text: root.exercise
+        size_hint_x: 0.45
+        text_size: self.width, None
+        halign: 'left'
+        valign: 'middle'
+        padding: (dp(5), 0)
+        color: 0, 0, 0, 1
+
+    Label:
+        text: root.gold
+        halign: 'center'
+        valign: 'middle'
+        color: 0.8, 0.6, 0.1, 1  # Золотой
+
+    Label:
+        text: root.silver
+        halign: 'center'
+        valign: 'middle'
+        color: 0.75, 0.75, 0.75, 1  # Серебряный
+
+    Label:
+        text: root.bronze
+        halign: 'center'
+        valign: 'middle'
+        color: 0.7, 0.5, 0.3, 1  # Бронзовый
+
+    Label:
+        text: root.unit
+        halign: 'right'
+        valign: 'middle'
+        color: 0, 0, 0, 1
+
+
+<NotebookEntry>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: dp(140)
+    padding: [dp(10), dp(5)]
+    spacing: dp(5)
+    canvas.before:
+        Color:
+            rgba: 0.88, 0.88, 0.88, 1  # Более темный серый фон
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        # Добавляем белую рамку для лучшего разделения
+        Color:
+            rgba: 1, 1, 1, 1
+        Line:
+            width: 1
+            rectangle: [self.x, self.y, self.width, self.height]
+
+    # Первая строка: Упражнение и кнопка удаления
+    BoxLayout:
+        size_hint_y: None
+        height: dp(30)
+        spacing: dp(10)
+
+        Label:
+            text: root.exercise
+            font_size: '16sp'
+            bold: True
+            color: 0.1, 0.1, 0.1, 1  # Более темный текст
+            halign: 'left'
+            text_size: self.width, None
+
+        Button:
+            text: 'Удалить'
+            size_hint_x: 0.3
+            background_color: 1, 0.3, 0.3, 1
+            color: 1, 1, 1, 1
+            on_press: root.delete_entry()
+
+    # Вторая строка: Результат и время
+    BoxLayout:
+        size_hint_y: None
+        height: dp(25)
+
+        Label:
+            text: f"Результат: {root.result}"
+            font_size: '14sp'
+            color: 0.2, 0.2, 0.2, 1  # Темно-серый
+            halign: 'left'
+
+        Label:
+            text: root.date.split()[1][:5] if ' ' in root.date else ''
+            font_size: '12sp'
+            color: 0.4, 0.4, 0.4, 1  # Серый
+            halign: 'right'
+
+    # Третья строка: Комментарий
+    Label:
+        text: f"Комментарий: {root.notes}" if root.notes else "Без комментариев"
+        size_hint_y: None
+        height: dp(40)
+        font_size: '14sp'
+        color: 0.3, 0.3, 0.3, 1  # Серый
+        halign: 'left'
+        text_size: self.width, None
+
+<SpinnerOption@Button>:
+    background_color: 0.95, 0.95, 0.95, 1
+    color: 0, 0, 0, 1
+    font_size: '14sp'
+    height: dp(40)
+    size_hint_y: None
+
+<NotebookScreen>:
+    exercises_spinner: spinner_exercises
+    result_input: result_input
+    notes_input: notes_input
+    entries_container: entries_container
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(10)
+
+        # Форма для новой записи
+        BoxLayout:
+            size_hint_y: None
+            height: dp(200)
+            orientation: 'vertical'
+            spacing: dp(5)
+            padding: [dp(5), dp(5)]
+            canvas.before:
+                Color:
+                    rgba: 0.97, 0.97, 0.97, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Label:
+                text: 'Новая запись'
+                size_hint_y: None
+                height: dp(30)
+                font_size: '18sp'
+                bold: True
+                color: 0, 0, 0, 1
+
+            Spinner:
+                id: spinner_exercises
+                text: 'Выберите упражнение'
+                size_hint_y: None
+                height: dp(40)
+                background_color: 0.95, 0.95, 0.95, 1
+                color: 0, 0, 0, 1
+                font_size: '14sp'
+                option_cls: 'SpinnerOption'
+                values: []
+                sync_height: True
+
+            TextInput:
+                id: result_input
+                hint_text: 'Результат (без ед.изм.)'
+                size_hint_y: None
+                height: dp(40)
+                foreground_color: 0, 0, 0, 1
+                background_color: 1, 1, 1, 1
+                padding: [dp(10), dp(5)]
+                multiline: False
+
+            TextInput:
+                id: notes_input
+                hint_text: 'Комментарий (необязательно)'
+                size_hint_y: None
+                height: dp(50)
+                foreground_color: 0, 0, 0, 1
+                background_color: 1, 1, 1, 1
+                padding: [dp(10), dp(5)]
+
+            Button:
+                text: 'Сохранить запись'
+                size_hint_y: None
+                height: dp(50)
+                background_color: 0.2, 0.6, 1, 1
+                color: 1, 1, 1, 1
+                bold: True
+                on_press: root.save_entry()
+
+        # Разделитель
+        BoxLayout:
+            size_hint_y: None
+            height: dp(1)
+            canvas.before:
+                Color:
+                    rgba: 0.8, 0.8, 0.8, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+        # Список записей
+        ScrollView:
+            bar_width: dp(10)
+            bar_color: 0.2, 0.6, 1, 1
+            bar_inactive_color: 0.7, 0.7, 0.7, 1
+            effect_cls: 'ScrollEffect'
+
+            GridLayout:
+                id: entries_container
+                cols: 1
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: dp(10)
+                padding: [dp(5), 0]
+
+        # Панель навигации
+        BoxLayout:
+            size_hint_y: None
+            height: dp(50)
+            spacing: dp(5)
+            padding: [dp(5), dp(5)]
+            canvas.before:
+                Color:
+                    rgba: 0.9, 0.9, 0.9, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Button:
+                text: 'Нормативы'
+                background_normal: ''
+                background_color: 0.2, 0.6, 1, 1
+                color: 1, 1, 1, 1
+                bold: True
+                on_press: root.manager.current = 'main'
+
+            Button:
+                text: 'Калькулятор'
+                background_normal: ''
+                background_color: 0.3, 0.7, 0.3, 1
+                color: 1, 1, 1, 1
+                bold: True
+                on_press: root.manager.current = 'calc'
+
+            Button:
+                text: 'Блокнот'
+                background_normal: ''
+                background_color: 0.8, 0.5, 0.2, 1
+                color: 1, 1, 1, 1
+                bold: True
+                on_press: root.manager.current = 'notebook'
+
+
+<CalculatorScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(20)
+        spacing: dp(15)
+
+        Label:
+            text: 'Калькулятор знака ГТО'
+            font_size: '24sp'
+            bold: True
+            size_hint_y: None
+            height: dp(50)
+            color: 0, 0, 0, 1
+
+        ScrollView:
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: dp(15)
+                padding: dp(10)
+
+                Label:
+                    text: root.badge_result
+                    font_size: '20sp'
+                    bold: True
+                    size_hint_y: None
+                    height: dp(40)
+                    color: 0.2, 0.4, 0.6, 1
+                    text_size: self.width, None
+                    halign: 'center'
+
+                Label:
+                    text: root.badge_details
+                    font_size: '16sp'
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    text_size: self.width, None
+                    color: 0, 0, 0, 1
+                    halign: 'left'
+
+        BoxLayout:
+            size_hint_y: None
+            height: dp(50)
+            spacing: dp(5)
+            padding: [dp(5), dp(5)]
+            canvas.before:
+                Color:
+                    rgba: 0.9, 0.9, 0.9, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Button:
+                text: 'Нормативы'
+                background_normal: ''
+                background_color: 0.2, 0.6, 1, 1
+                color: 1, 1, 1, 1
+                bold: True
+                on_press: root.manager.current = 'main'
+
+            Button:
+                text: 'Калькулятор'
+                background_normal: ''
+                background_color: 0.3, 0.7, 0.3, 1
+                color: 1, 1, 1, 1
+                bold: True
+                on_press: root.manager.current = 'calc'
+
+            Button:
+                text: 'Блокнот'
+                background_normal: ''
+                background_color: 0.8, 0.5, 0.2, 1
+                color: 1, 1, 1, 1
+                bold: True
+                on_press: root.manager.current = 'notebook'
