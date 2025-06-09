@@ -66,11 +66,23 @@
         padding: dp(10)
         spacing: dp(10)
 
-        # Заголовок с информацией
+        # Верхняя панель с информацией и кнопкой подсказки
         BoxLayout:
             size_hint_y: None
             height: dp(50)
             orientation: 'horizontal'
+
+            # Кнопка подсказки
+            Button:
+                size_hint_x: None
+                width: dp(50)
+                background_normal: ''
+                background_color: 0.2, 0.6, 1, 1
+                color: 1, 1, 1, 1
+                text: '?'
+                font_size: '20sp'
+                bold: True
+                on_press: root.show_category_help()
 
             Label:
                 text: root.stage_info
@@ -151,6 +163,114 @@
                     height: self.minimum_height
                     spacing: dp(5)
 
+        # Подсказка по категориям (изначально скрыта)
+        BoxLayout:
+            id: category_help
+            size_hint_y: None
+            height: 0
+            opacity: 0
+            orientation: 'vertical'
+            padding: dp(10)
+            spacing: dp(5)
+            canvas.before:
+                Color:
+                    rgba: 0.1, 0.1, 0.1,  1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            GridLayout:
+                cols: 2
+                spacing: dp(5)
+                size_hint_y: None
+                height: dp(160)
+
+                BoxLayout:
+                    canvas.before:
+                        Color:
+                            rgba: 0.96, 0.80, 0.80, 0.7
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        text: 'Сила'
+                        color: 0, 0, 0, 1
+
+                BoxLayout:
+                    canvas.before:
+                        Color:
+                            rgba: 0.80, 0.84, 0.96, 0.7
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        text: 'Скорость'
+                        color: 0, 0, 0, 1
+
+                BoxLayout:
+                    canvas.before:
+                        Color:
+                            rgba: 0.80, 0.96, 0.84, 0.7
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        text: 'Выносливость'
+                        color: 0, 0, 0, 1
+
+                BoxLayout:
+                    canvas.before:
+                        Color:
+                            rgba: 0.96, 0.96, 0.80, 0.7
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        text: 'Гибкость'
+                        color: 0, 0, 0, 1
+
+                BoxLayout:
+                    canvas.before:
+                        Color:
+                            rgba: 0.92, 0.80, 0.96, 0.7
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        text: 'Координация'
+                        color: 0, 0, 0, 1
+
+                BoxLayout:
+                    canvas.before:
+                        Color:
+                            rgba: 0.88, 0.80, 0.96, 0.7
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        text: 'Скорость-сила'
+                        color: 0, 0, 0, 1
+
+                BoxLayout:
+                    canvas.before:
+                        Color:
+                            rgba: 0.80, 0.96, 0.96, 0.7
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        text: 'Прикладное'
+                        color: 0, 0, 0, 1
+
+                Label:
+                    text: '#Цвета категорий#'
+                    font_size: '17sp'
+                    bold: True
+                    color: 0.9, 0.9, 0.9, 1
+
+
+
+        # Нижняя панель навигации
         BoxLayout:
             size_hint_y: None
             height: dp(50)
@@ -187,7 +307,6 @@
                 bold: True
                 on_press: root.manager.current = 'notebook'
 
-
 <StandardItem>:
     cols: 5
     size_hint_y: None
@@ -195,12 +314,6 @@
     padding: [dp(5), dp(5)]
     spacing: dp(5)
 
-    canvas.before:
-        Color:
-            rgba: 0.95, 0.95, 0.95, 1  # Или используйте вариант с index, если добавили свойство
-        Rectangle:
-            pos: self.pos
-            size: self.size
 
     Label:
         text: root.exercise
@@ -215,19 +328,19 @@
         text: root.gold
         halign: 'center'
         valign: 'middle'
-        color: 0.8, 0.6, 0.1, 1  # Золотой
+        color: 0.9, 0.7, 0.0, 1  # Золотой
 
     Label:
         text: root.silver
         halign: 'center'
         valign: 'middle'
-        color: 0.75, 0.75, 0.75, 1  # Серебряный
+        color: 0.92, 0.92, 0.95, 1  # Серебряный
 
     Label:
         text: root.bronze
         halign: 'center'
         valign: 'middle'
-        color: 0.7, 0.5, 0.3, 1  # Бронзовый
+        color: 0.85, 0.6, 0.2, 1  # Бронзовый
 
     Label:
         text: root.unit
@@ -305,7 +418,7 @@
 
 <SpinnerOption@Button>:
     background_color: 0.95, 0.95, 0.95, 1
-    color: 0, 0, 0, 1
+    color: 1, 1, 1, 1
     font_size: '14sp'
     height: dp(40)
     size_hint_y: None
@@ -450,43 +563,47 @@
 <CalculatorScreen>:
     BoxLayout:
         orientation: 'vertical'
-        padding: dp(20)
-        spacing: dp(15)
+        padding: dp(15)
+        spacing: dp(10)
 
         Label:
             text: 'Калькулятор знака ГТО'
             font_size: '24sp'
             bold: True
             size_hint_y: None
-            height: dp(50)
-            color: 0, 0, 0, 1
+            height: dp(40)
 
         ScrollView:
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-                spacing: dp(15)
-                padding: dp(10)
+                spacing: dp(10)
 
                 Label:
                     text: root.badge_result
                     font_size: '20sp'
-                    bold: True
+                    markup: True
                     size_hint_y: None
                     height: dp(40)
-                    color: 0.2, 0.4, 0.6, 1
                     text_size: self.width, None
-                    halign: 'center'
+
+                Label:
+                    text: root.missing_info
+                    font_size: '16sp'
+                    markup: True
+                    color: (1, 0.2, 0.2, 1)
+                    size_hint_y: None
+                    height: self.texture_size[1] if self.text else 0
+                    text_size: self.width, None
 
                 Label:
                     text: root.badge_details
                     font_size: '16sp'
+                    markup: True
                     size_hint_y: None
                     height: self.texture_size[1]
                     text_size: self.width, None
-                    color: 0, 0, 0, 1
-                    halign: 'left'
 
         BoxLayout:
             size_hint_y: None

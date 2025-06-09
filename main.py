@@ -5,6 +5,7 @@ from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from  kivy.uix.label import Label
+from kivy.graphics import Color, Rectangle
 from kivy.uix.recyclegridlayout import RecycleGridLayout
 from kivy.properties import ObjectProperty, StringProperty, NumericProperty
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
@@ -26,10 +27,43 @@ class StandardItem(RecycleDataViewBehavior, GridLayout):
     silver = StringProperty("")
     bronze = StringProperty("")
     unit = StringProperty("")
-    index = NumericProperty(0)  # Добавляем свойство index
+    index = NumericProperty(0)
+    category = StringProperty("")
+
+    def __init__(self, **kwargs):
+        super(StandardItem, self).__init__(**kwargs)
+        self.bind(pos=self.update_rect, size=self.update_rect, category=self.update_color)
+
+    def update_rect(self, *args):
+        """Обновляет размер и позицию прямоугольника"""
+        if hasattr(self, 'rect'):
+            self.rect.pos = self.pos
+            self.rect.size = self.size
+
+    def update_color(self, *args):
+        """Обновляет цвет фона при изменении категории"""
+        self.canvas.before.clear()
+        with self.canvas.before:
+            # Используем более светлые оттенки для лучшей читаемости
+            Color(*self.get_category_color())
+            self.rect = Rectangle(pos=self.pos, size=self.size)
+
+    def get_category_color(self):
+        """Возвращает приятные пастельные цвета для категорий"""
+        category_colors = {
+            'сила': (0.96, 0.80, 0.80, 0.7),       # Нежно-розовый
+            'скорость': (0.80, 0.84, 0.96, 0.7),    # Нежно-голубой
+            'выносливость': (0.80, 0.96, 0.84, 0.7), # Нежно-зеленый
+            'гибкость': (0.96, 0.96, 0.80, 0.7),    # Нежно-желтый
+            'координация': (0.92, 0.80, 0.96, 0.7), # Нежно-сиреневый
+            'прикладное': (0.80, 0.96, 0.96, 0.7),    # Нежно-бирюзовый
+            'скорость-сила': (0.88, 0.80, 0.96, 0.7) # Нежно-лавандовый
+        }
+        return category_colors.get(self.category.lower(), (0.98, 0.98, 0.98, 1))  # Почти белый по умолчанию
 
     def refresh_view_attrs(self, rv, index, data):
-        self.index = index  # Устанавливаем индекс при обновлении
+        self.index = index
+        self.category = data.get('category', '')
         return super().refresh_view_attrs(rv, index, data)
 
 
@@ -126,6 +160,19 @@ class MainScreen(Screen):
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
 
+    def show_category_help(self):
+        """Показывает/скрывает подсказку по категориям"""
+        help_box = self.ids.category_help
+        if help_box.height == 0:
+            # Показываем подсказку
+            help_box.height = dp(180)
+            help_box.opacity = 1
+        else:
+            # Скрываем подсказку
+            help_box.height = 0
+            help_box.opacity = 0
+
+
     def on_pre_enter(self):
         """Проверяем данные пользователя при открытии"""
         store = JsonStore('user_data.json')
@@ -158,7 +205,8 @@ class MainScreen(Screen):
                 'gold': str(item['gold']),  # Преобразуйте в строку!
                 'silver': str(item['silver']),
                 'bronze': str(item['bronze']),
-                'unit': item['unit']
+                'unit': item['unit'],
+                'category': item.get('category', '')
             }
             for item in standards
         ]
@@ -298,6 +346,7 @@ class NotebookScreen(Screen):
 class CalculatorScreen(Screen):
     badge_result = StringProperty("")
     badge_details = StringProperty("")
+    missing_info = StringProperty("")
 
     def on_pre_enter(self):
         """Вычисляем знак ГТО при открытии экрана"""
@@ -313,31 +362,59 @@ class CalculatorScreen(Screen):
                 details = []
 
                 # Добавляем информацию об обязательных нормативах
-                details.append("\nОбязательные нормативы:")
+                details.append("[b]Обязательные нормативы:[/b]")
                 for item in result['completed_required']:
-                    details.append(f"{item['exercise']}: {item['result']} {item['unit']} ({item['badge']})")
+                    badge_icon = "🥇" if item['badge'] == 'gold' else "🥈" if item['badge'] == 'silver' else "🥉"
+                    details.append(f"{badge_icon} {item['exercise']}: {item['result']} {item['unit']} {item.get('badge_text', '')}")
 
                 # Добавляем информацию о нормативах по выбору
-                details.append("\nНормативы по выбору:")
-                for item in result['completed_optional']:
-                    details.append(f"{item['exercise']}: {item['result']} {item['unit']} ({item['badge']})")
+                details.append("\n[b]Нормативы по выбору:[/b]")
+                if result['completed_optional']:
+                    for item in result['completed_optional']:
+                        badge_icon = "🥇" if item['badge'] == 'gold' else "🥈" if item['badge'] == 'silver' else "🥉"
+                        details.append(f"{badge_icon} {item['exercise']}: {item['result']} {item['unit']} {item.get('badge_text', '')}")
+                else:
+                    details.append("Нет выполненных нормативов")
 
                 self.badge_details = "\n".join(details)
+                self.missing_info = ""
             else:
-                self.badge_result = "Вы пока не можете получить знак ГТО"
+                self.badge_result = "[color=ff3333]Вы пока не можете получить знак ГТО[/color]"
 
-                details = []
+                if result.get('badge') == 'silver' and len(result['completed_optional']) >= 1:
+                    self.badge_result += "\n[color=00aa00]Но вы можете получить серебряный знак![/color]"
+
+                missing_details = []
                 if result['missing_required']:
-                    details.append(f"\nНе выполнены обязательные категории: {', '.join(result['missing_required'])}")
+                    missing_details.append("\n[b][color=ff3333]Не выполнены обязательные категории:[/color][/b]")
+                    missing_details.append(", ".join(result['missing_required']))
 
+                required_optional = 2 if result.get('badge') == 'gold' else 1
                 if result['missing_optional'] > 0:
-                    required = 2 if result['badge'] == 'gold' else 1
-                    details.append(f"\nНе хватает {result['missing_optional']} из {required} нормативов по выбору")
+                    missing_details.append(
+                        f"\n[b][color=ff3333]Не хватает {result['missing_optional']} из {required_optional} нормативов по выбору[/color][/b]")
 
-                self.badge_details = "\n".join(details) if details else "Выполните нормативы для получения знака"
+                self.missing_info = "\n".join(missing_details) if missing_details else ""
+
+                # Показываем выполненные нормативы даже если знак не получить
+                details = []
+                if result['completed_required']:
+                    details.append("[b]Выполненные обязательные нормативы:[/b]")
+                    for item in result['completed_required']:
+                        badge_icon = "🥇" if item['badge'] == 'gold' else "🥈" if item['badge'] == 'silver' else "🥉"
+                        details.append(f"{badge_icon} {item['exercise']}: {item['result']} {item['unit']} {item.get('badge_text', '')}")
+
+                if result['completed_optional']:
+                    details.append("\n[b]Выполненные нормативы по выбору:[/b]")
+                    for item in result['completed_optional']:
+                        badge_icon = "🥇" if item['badge'] == 'gold' else "🥈" if item['badge'] == 'silver' else "🥉"
+                        details.append(f"{badge_icon} {item['exercise']}: {item['result']} {item['unit']} {item.get('badge_text', '')}")
+
+                self.badge_details = "\n".join(details) if details else "Нет выполненных нормативов"
         else:
-            self.badge_result = "Сначала зарегистрируйтесь"
+            self.badge_result = "[color=ff3333]Сначала зарегистрируйтесь[/color]"
             self.badge_details = ""
+            self.missing_info = ""
 
 
 class GTOApp(App):

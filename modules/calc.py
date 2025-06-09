@@ -45,12 +45,18 @@ def is_better_result(exercise, stage, gender, new_result, old_result):
 
 def calculate_badge(user_data):
     """Рассчитывает, какой знак ГТО может получить пользователь"""
-    # Уровни знаков для сравнения
     badge_levels = {'gold': 3, 'silver': 2, 'bronze': 1}
 
     store = JsonStore('user_data.json')
     if not store.exists('user'):
-        return None
+        return {
+            'can_get_badge': False,
+            'badge': None,
+            'missing_required': [],
+            'missing_optional': 0,
+            'completed_required': [],
+            'completed_optional': []
+        }
 
     user_data = store.get('user')
     stage = user_data['stage']
@@ -81,6 +87,7 @@ def calculate_badge(user_data):
     # Проверяем выполненные обязательные нормативы
     completed_required = []
     missing_required = []
+    required_badge = 'gold'  # Начинаем с максимального возможного знака
 
     for category in required_categories:
         # Находим все упражнения в этой категории
@@ -124,16 +131,22 @@ def calculate_badge(user_data):
                                 'gold': gold,
                                 'silver': silver,
                                 'bronze': bronze,
-                                'unit': unit
+                                'unit': unit,
+                                'badge_text': f"({badge})"  # Добавляем текст знака
                             }
 
         if best_in_category:
             completed_required.append(best_in_category)
+            # Обновляем минимальный знак среди обязательных
+            if badge_levels[best_in_category['badge']] < badge_levels[required_badge]:
+                required_badge = best_in_category['badge']
         else:
             missing_required.append(category)
 
     # Проверяем выполненные нормативы по выбору
     completed_optional = []
+    optional_badge = 'gold'  # Начинаем с максимального возможного знака
+
     for category in optional_categories:
         # Находим все упражнения в этой категории
         conn = sqlite3.connect('gto.db')
@@ -176,17 +189,15 @@ def calculate_badge(user_data):
                                 'gold': gold,
                                 'silver': silver,
                                 'bronze': bronze,
-                                'unit': unit
+                                'unit': unit,
+                                'badge_text': f"({badge})"  # Добавляем текст знака
                             }
 
         if best_in_category:
             completed_optional.append(best_in_category)
-
-    # Определяем минимальный знак среди выполненных нормативов
-    min_badge = 'gold'
-    for item in completed_required:
-        if badge_levels[item['badge']] < badge_levels[min_badge]:
-            min_badge = item['badge']
+            # Обновляем минимальный знак среди нормативов по выбору
+            if badge_levels[best_in_category['badge']] < badge_levels[optional_badge]:
+                optional_badge = best_in_category['badge']
 
     # Определяем итоговый результат
     result = {
@@ -202,18 +213,25 @@ def calculate_badge(user_data):
     if missing_required:
         return result
 
-    # Если нет ни одного норматива по выбору → знак не получить
-    if not completed_optional:
-        result['missing_optional'] = 1  # нужно сдать минимум 1
-        return result
+    # Определяем возможный знак (минимум между обязательными и по выбору)
+    possible_badge = min(required_badge, optional_badge, key=lambda x: badge_levels[x])
 
-    # Определяем, сколько нормативов по выбору нужно для текущего min_badge
-    required_optional = 2 if min_badge == 'gold' else 1
-
-    if len(completed_optional) >= required_optional:
+    # Проверяем условия для каждого знака
+    if possible_badge == 'gold' and len(completed_optional) >= 2:
         result['can_get_badge'] = True
-        result['badge'] = min_badge
+        result['badge'] = 'gold'
+    elif possible_badge in ('silver', 'bronze') and len(completed_optional) >= 1:
+        result['can_get_badge'] = True
+        result['badge'] = possible_badge
+    elif possible_badge == 'gold' and len(completed_optional) == 1:
+        # Если все обязательные на gold, но только 1 по выбору - предлагаем silver
+        silver_possible = all(item['badge'] in ('gold', 'silver') for item in completed_required)
+        if silver_possible:
+            result['can_get_badge'] = True
+            result['badge'] = 'silver'
+        else:
+            result['missing_optional'] = 1
     else:
-        result['missing_optional'] = required_optional - len(completed_optional)
+        result['missing_optional'] = 2 if possible_badge == 'gold' else 1
 
     return result
