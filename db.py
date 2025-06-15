@@ -689,4 +689,3 @@ def _fill_standards(cursor):
     )
 
 init_db()
-print("База данных создана и заполнена нормативами!")

@@ -60,63 +60,115 @@
             bold: True
             on_press: root.register_user()
 
+
+<NavigationButton@Button>:
+    size_hint: None, None
+    size: dp(32), dp(48)  # Квадратная кнопка
+    background_color: 0, 0, 0, 0  # Прозрачный фон
+    canvas.before:
+        Color:
+            rgba: (0.12, 0.36, 0.46, 1) if self.state == 'normal' else (0.08, 0.28, 0.38, 1)  # Цвет фона
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(12)]
+        Color:
+            rgba: 1, 1, 1, 1  # Белый цвет иконки
+        Rectangle:
+            source: self.background_normal
+            pos: self.center_x - dp(24), self.center_y - dp(24)
+            size: dp(48), dp(48)
+
+
 <MainScreen>:
     BoxLayout:
         orientation: 'vertical'
-        padding: dp(10)
-        spacing: dp(10)
+        padding: dp(8)
+        spacing: dp(8)
+        canvas.before:
+            Color:
+                rgba: 0.97, 0.97, 0.97, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
 
-        # Верхняя панель с информацией и кнопкой подсказки
+        # Верхняя панель
         BoxLayout:
             size_hint_y: None
-            height: dp(50)
-            orientation: 'horizontal'
+            height: dp(56)
+            padding: dp(8)
+            spacing: dp(8)
+            canvas.before:
+                Color:
+                    rgba: 0.18, 0.53, 0.67, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
 
-            # Кнопка подсказки
+
             Button:
                 size_hint_x: None
-                width: dp(50)
+                width: dp(40)
                 background_normal: ''
-                background_color: 0.2, 0.6, 1, 1
+                background_color: 0.95, 0.95, 0.95, 0.2
                 color: 1, 1, 1, 1
                 text: '?'
                 font_size: '20sp'
                 bold: True
                 on_press: root.show_category_help()
+                canvas.before:
+                    Color:
+                        rgba: 0, 0, 0, 0.1
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [dp(20),]
 
             Label:
                 text: root.stage_info
-                font_size: 16
+                font_size: '16sp'
                 bold: True
-                size_hint_x: 0.7
+                color: 1, 1, 1, 1
                 halign: 'left'
+                text_size: self.width, None
 
             Label:
                 text: f"Пол: {root.gender}"
-                font_size: 16
-                size_hint_x: 0.3
+                font_size: '15sp'
+                color: 1, 1, 1, 0.9
                 halign: 'right'
 
             Button:
                 text: 'Выйти'
-                size_hint_x: 0.3
-                background_color: 1, 0.3, 0.3, 1
+                size_hint_x: None
+                width: dp(80)
+                background_normal: ''
+                background_color: 0.91, 0.11, 0.21, 1
                 color: 1, 1, 1, 1
+                font_size: '15sp'
                 on_press: root.logout()
+                canvas.before:
+                    Color:
+                        rgba: 0, 0, 0, 0.1
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [dp(8),]
 
-        # Заголовки колонок
+        # Заголовки таблицы
         GridLayout:
             cols: 5
             size_hint_y: None
             height: dp(40)
-            spacing: dp(5)
-            padding: [dp(5), 0]
+            spacing: dp(2)
+            padding: dp(4)
             canvas.before:
                 Color:
-                    rgba: 0.2, 0.4, 0.6, 1  # Фон заголовков
-                Rectangle:
+                    rgba: 0.12, 0.36, 0.46, 1  # Темно-синий
+                RoundedRectangle:
                     pos: self.pos
                     size: self.size
+                    radius: [dp(8), dp(8), 0, 0]
 
             Label:
                 text: 'Упражнение'
@@ -124,34 +176,43 @@
                 bold: True
                 size_hint_x: 0.45
                 halign: 'left'
+                font_size: '14sp'
 
             Label:
                 text: 'Золото'
                 color: 1, 1, 1, 1
                 bold: True
                 halign: 'center'
+                font_size: '14sp'
 
             Label:
                 text: 'Серебро'
                 color: 1, 1, 1, 1
                 bold: True
                 halign: 'center'
+                font_size: '14sp'
 
             Label:
                 text: 'Бронза'
                 color: 1, 1, 1, 1
                 bold: True
                 halign: 'center'
+                font_size: '14sp'
 
             Label:
                 text: 'Ед.изм.'
                 color: 1, 1, 1, 1
                 bold: True
                 halign: 'right'
+                font_size: '14sp'
 
         # Таблица с нормативами
         ScrollView:
-            bar_width: dp(10)
+            bar_width: dp(8)
+            bar_color: 0.18, 0.53, 0.67, 1
+            bar_inactive_color: 0.7, 0.7, 0.7, 1
+            effect_cls: 'ScrollEffect'
+
             RecycleView:
                 id: rv
                 viewclass: 'StandardItem'
@@ -161,29 +222,40 @@
                     default_size_hint: (1, None)
                     size_hint_y: None
                     height: self.minimum_height
-                    spacing: dp(5)
+                    spacing: dp(4)
+                    padding: [dp(4), dp(4)]
 
-        # Подсказка по категориям (изначально скрыта)
+        # Подсказка по категориям
         BoxLayout:
             id: category_help
             size_hint_y: None
             height: 0
             opacity: 0
             orientation: 'vertical'
-            padding: dp(10)
-            spacing: dp(5)
+            padding: dp(12)
+            spacing: dp(8)
             canvas.before:
                 Color:
-                    rgba: 0.1, 0.1, 0.1,  1
-                Rectangle:
+                    rgba: 0.3, 0.3, 0.3, 0.3
+                RoundedRectangle:
                     pos: self.pos
                     size: self.size
+                    radius: [0, 0, dp(8), dp(8)]
+
+            Label:
+                text: 'Категории упражнений'
+                font_size: '18sp'
+                bold: True
+                color: 0.4, 0.4, 0.4, 0.7
+                size_hint_y: None
+                height: dp(30)
 
             GridLayout:
                 cols: 2
-                spacing: dp(5)
+                spacing: dp(8)
                 size_hint_y: None
                 height: dp(160)
+
 
                 BoxLayout:
                     canvas.before:
@@ -243,7 +315,7 @@
                 BoxLayout:
                     canvas.before:
                         Color:
-                            rgba: 0.88, 0.80, 0.96, 0.7
+                            rgba: 0.86, 0.86, 0.70, 0.7
                         Rectangle:
                             pos: self.pos
                             size: self.size
@@ -262,50 +334,38 @@
                         text: 'Прикладное'
                         color: 0, 0, 0, 1
 
-                Label:
-                    text: '#Цвета категорий#'
-                    font_size: '17sp'
-                    bold: True
-                    color: 0.9, 0.9, 0.9, 1
-
-
-
-        # Нижняя панель навигации
+        # Нижняя навигация
         BoxLayout:
             size_hint_y: None
-            height: dp(50)
-            spacing: dp(5)
-            padding: [dp(5), dp(5)]
+            height: dp(56)
+            spacing: dp(8)
+            padding: [dp(8), dp(8)]
             canvas.before:
                 Color:
-                    rgba: 0.9, 0.9, 0.9, 1
-                Rectangle:
+                    rgba: 0.18, 0.53, 0.67, 1
+                RoundedRectangle:
                     pos: self.pos
                     size: self.size
+                    radius: [dp(8),]
 
-            Button:
-                text: 'Нормативы'
-                background_normal: ''
-                background_color: 0.2, 0.6, 1, 1
-                color: 1, 1, 1, 1
-                bold: True
-                on_press: root.manager.current = 'main'
-
-            Button:
-                text: 'Калькулятор'
-                background_normal: ''
-                background_color: 0.3, 0.7, 0.3, 1
-                color: 1, 1, 1, 1
-                bold: True
+            NavigationButton:
+                background_normal: 'assets/calc.png'
+                size_hint_x: 0.33
                 on_press: root.manager.current = 'calc'
+                pos_hint: {'center_x': 0.5}
 
-            Button:
-                text: 'Блокнот'
-                background_normal: ''
-                background_color: 0.8, 0.5, 0.2, 1
-                color: 1, 1, 1, 1
-                bold: True
+            NavigationButton:
+                background_normal: 'assets/table_icon.png'
+                size_hint_x: 0.33
+                on_press: root.manager.current = 'main'
+                pos_hint: {'center_x': 0.5}
+
+
+            NavigationButton:
+                background_normal: 'assets/notes.png'
+                size_hint_x: 0.33
                 on_press: root.manager.current = 'notebook'
+                pos_hint: {'center_x': 0.5}
 
 <StandardItem>:
     cols: 5
@@ -334,7 +394,7 @@
         text: root.silver
         halign: 'center'
         valign: 'middle'
-        color: 0.92, 0.92, 0.95, 1  # Серебряный
+        color: 0.72, 0.72, 0.75, 1  # Серебряный
 
     Label:
         text: root.bronze
@@ -357,13 +417,13 @@
     spacing: dp(5)
     canvas.before:
         Color:
-            rgba: 0.88, 0.88, 0.88, 1  # Более темный серый фон
+            rgba: 0.80, 0.96, 0.96, 0.7  # Нежно бирюзовый
         Rectangle:
             pos: self.pos
             size: self.size
-        # Добавляем белую рамку для лучшего разделения
+        # Добавляем синюю рамку для лучшего разделения
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: 0.18, 0.53, 0.67, 1
         Line:
             width: 1
             rectangle: [self.x, self.y, self.width, self.height]
@@ -418,7 +478,7 @@
 
 <SpinnerOption@Button>:
     background_color: 0.95, 0.95, 0.95, 1
-    color: 1, 1, 1, 1
+    color: 0, 0, 0, 1
     font_size: '14sp'
     height: dp(40)
     size_hint_y: None
@@ -433,6 +493,12 @@
         orientation: 'vertical'
         padding: dp(10)
         spacing: dp(10)
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
 
         # Форма для новой записи
         BoxLayout:
@@ -443,7 +509,7 @@
             padding: [dp(5), dp(5)]
             canvas.before:
                 Color:
-                    rgba: 0.97, 0.97, 0.97, 1
+                    rgba: 0.18, 0.53, 0.67, 1
                 Rectangle:
                     pos: self.pos
                     size: self.size
@@ -455,6 +521,9 @@
                 font_size: '18sp'
                 bold: True
                 color: 0, 0, 0, 1
+                canvas.before:
+                    Color:
+                        rgba: 0.85, 0.85, 0.85, 1
 
             Spinner:
                 id: spinner_exercises
@@ -502,7 +571,7 @@
             height: dp(1)
             canvas.before:
                 Color:
-                    rgba: 0.8, 0.8, 0.8, 1
+                    rgba: 0.5, 0.5, 0.5, 1
                 Rectangle:
                     pos: self.pos
                     size: self.size
@@ -521,122 +590,157 @@
                 height: self.minimum_height
                 spacing: dp(10)
                 padding: [dp(5), 0]
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 1
 
         # Панель навигации
         BoxLayout:
             size_hint_y: None
-            height: dp(50)
-            spacing: dp(5)
-            padding: [dp(5), dp(5)]
+            height: dp(56)
+            spacing: dp(8)
+            padding: [dp(8), dp(8)]
             canvas.before:
                 Color:
-                    rgba: 0.9, 0.9, 0.9, 1
-                Rectangle:
+                    rgba: 0.18, 0.53, 0.67, 1
+                RoundedRectangle:
                     pos: self.pos
                     size: self.size
+                    radius: [dp(8),]
 
-            Button:
-                text: 'Нормативы'
-                background_normal: ''
-                background_color: 0.2, 0.6, 1, 1
-                color: 1, 1, 1, 1
-                bold: True
-                on_press: root.manager.current = 'main'
-
-            Button:
-                text: 'Калькулятор'
-                background_normal: ''
-                background_color: 0.3, 0.7, 0.3, 1
-                color: 1, 1, 1, 1
-                bold: True
+            NavigationButton:
+                background_normal: 'assets/calc.png'
+                size_hint_x: 0.33
                 on_press: root.manager.current = 'calc'
+                pos_hint: {'center_x': 0.5}
 
-            Button:
-                text: 'Блокнот'
-                background_normal: ''
-                background_color: 0.8, 0.5, 0.2, 1
-                color: 1, 1, 1, 1
-                bold: True
+            NavigationButton:
+                background_normal: 'assets/table_icon.png'
+                size_hint_x: 0.33
+                on_press: root.manager.current = 'main'
+                pos_hint: {'center_x': 0.5}
+
+
+            NavigationButton:
+                background_normal: 'assets/notes.png'
+                size_hint_x: 0.33
                 on_press: root.manager.current = 'notebook'
+                pos_hint: {'center_x': 0.5}
 
 
 <CalculatorScreen>:
     BoxLayout:
         orientation: 'vertical'
-        padding: dp(15)
-        spacing: dp(10)
-
-        Label:
-            text: 'Калькулятор знака ГТО'
-            font_size: '24sp'
-            bold: True
-            size_hint_y: None
-            height: dp(40)
-
-        ScrollView:
-            BoxLayout:
-                orientation: 'vertical'
-                size_hint_y: None
-                height: self.minimum_height
-                spacing: dp(10)
-
-                Label:
-                    text: root.badge_result
-                    font_size: '20sp'
-                    markup: True
-                    size_hint_y: None
-                    height: dp(40)
-                    text_size: self.width, None
-
-                Label:
-                    text: root.missing_info
-                    font_size: '16sp'
-                    markup: True
-                    color: (1, 0.2, 0.2, 1)
-                    size_hint_y: None
-                    height: self.texture_size[1] if self.text else 0
-                    text_size: self.width, None
-
-                Label:
-                    text: root.badge_details
-                    font_size: '16sp'
-                    markup: True
-                    size_hint_y: None
-                    height: self.texture_size[1]
-                    text_size: self.width, None
+        padding: dp(8)
+        spacing: dp(16)
+        canvas.before:
+            Color:
+                rgba: 0.97, 0.97, 0.97, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
 
         BoxLayout:
             size_hint_y: None
-            height: dp(50)
-            spacing: dp(5)
-            padding: [dp(5), dp(5)]
+            height: dp(56)
             canvas.before:
                 Color:
-                    rgba: 0.9, 0.9, 0.9, 1
+                    rgba: 0.18, 0.53, 0.67, 1
                 Rectangle:
                     pos: self.pos
                     size: self.size
 
-            Button:
-                text: 'Нормативы'
-                background_normal: ''
-                background_color: 0.2, 0.6, 1, 1
-                color: 1, 1, 1, 1
+            Label:
+                text: 'Калькулятор знака ГТО'
+                font_size: '20sp'
                 bold: True
-                on_press: root.manager.current = 'main'
+                size_hint_y: None
+                height: dp(60)
+                color: 1, 1, 1, 1
 
-            Button:
-                text: 'Калькулятор'
-                background_normal: ''
-                background_color: 0.3, 0.7, 0.3, 1
-                color: 1, 1, 1, 1
-                bold: True
+
+        BoxLayout:
+            size_hint_y: None
+            height: dp(120)
+            padding: dp(16)
+            spacing: dp(8)
+            orientation: 'vertical'
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [dp(8),]
+                Color:
+                    rgba: 0.9, 0.9, 0.9, 1
+                Line:
+                    width: 1
+                    rounded_rectangle: [self.x, self.y, self.width, self.height, dp(8)]
+
+            Label:
+                text: root.badge_result
+                font_size: '20sp'
+                markup: True
+                color: 0, 0, 0, 1
+                size_hint_y: None
+                height: dp(40)
+                text_size: self.width, None
+                halign: 'center'
+                valign: 'middle'
+
+            Label:
+                text: root.missing_info
+                font_size: '16sp'
+                markup: True
+                color: 0, 0, 0, 1
+                size_hint_y: None
+                height: self.texture_size[1] if self.text else 0
+                text_size: self.width, None
+                halign: 'center'
+
+        ScrollView:
+            Label:
+                text: root.badge_details
+                font_size: '16sp'
+                markup: True
+                color: 0, 0, 0, 1
+                size_hint_y: None
+                height: self.texture_size[1]
+                text_size: self.width - dp(32), None
+                padding: [dp(16), dp(16)]
+                halign: 'left'
+                valign: 'top'
+
+        # Нижняя навигация
+        BoxLayout:
+            size_hint_y: None
+            height: dp(56)
+            spacing: dp(8)
+            padding: [dp(8), dp(8)]
+            canvas.before:
+                Color:
+                    rgba: 0.18, 0.53, 0.67, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [dp(8),]
+
+            NavigationButton:
+                background_normal: 'assets/calc.png'
+                size_hint_x: 0.33
                 on_press: root.manager.current = 'calc'
+                pos_hint: {'center_x': 0.5}
 
-            Button:
-                text: 'Блокнот'
-                background_normal: ''
-                background_color: 0.8, 0.5, 0.2, 1
-                color: 1, 1, 1, 1
-                bold: True
+            NavigationButton:
+                background_normal: 'assets/table_icon.png'
+                size_hint_x: 0.33
+                on_press: root.manager.current = 'main'
+                pos_hint: {'center_x': 0.5}
+
+
+            NavigationButton:
+                background_normal: 'assets/notes.png'
+                size_hint_x: 0.33
                 on_press: root.manager.current = 'notebook'
+                pos_hint: {'center_x': 0.5}

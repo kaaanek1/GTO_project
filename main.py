@@ -4,6 +4,7 @@ from kivy.lang import Builder
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.button import Button
 from  kivy.uix.label import Label
 from kivy.graphics import Color, Rectangle
 from kivy.uix.recyclegridlayout import RecycleGridLayout
@@ -57,7 +58,7 @@ class StandardItem(RecycleDataViewBehavior, GridLayout):
             'гибкость': (0.96, 0.96, 0.80, 0.7),    # Нежно-желтый
             'координация': (0.92, 0.80, 0.96, 0.7), # Нежно-сиреневый
             'прикладное': (0.80, 0.96, 0.96, 0.7),    # Нежно-бирюзовый
-            'скорость-сила': (0.88, 0.80, 0.96, 0.7) # Нежно-лавандовый
+            'скорость-сила': (0.86, 0.86, 0.70, 0.7) # Грязный желтый
         }
         return category_colors.get(self.category.lower(), (0.98, 0.98, 0.98, 1))  # Почти белый по умолчанию
 
@@ -417,7 +418,10 @@ class CalculatorScreen(Screen):
             self.missing_info = ""
 
 
+
+
 class GTOApp(App):
+
     def build(self):
         from db import init_db
         init_db()
