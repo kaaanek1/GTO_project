@@ -36,31 +36,27 @@ class StandardItem(RecycleDataViewBehavior, GridLayout):
         self.bind(pos=self.update_rect, size=self.update_rect, category=self.update_color)
 
     def update_rect(self, *args):
-        """Обновляет размер и позицию прямоугольника"""
         if hasattr(self, 'rect'):
             self.rect.pos = self.pos
             self.rect.size = self.size
 
     def update_color(self, *args):
-        """Обновляет цвет фона при изменении категории"""
         self.canvas.before.clear()
         with self.canvas.before:
-            # Используем более светлые оттенки для лучшей читаемости
             Color(*self.get_category_color())
             self.rect = Rectangle(pos=self.pos, size=self.size)
 
     def get_category_color(self):
-        """Возвращает приятные пастельные цвета для категорий"""
         category_colors = {
-            'сила': (0.96, 0.80, 0.80, 0.7),       # Нежно-розовый
-            'скорость': (0.80, 0.84, 0.96, 0.7),    # Нежно-голубой
-            'выносливость': (0.80, 0.96, 0.84, 0.7), # Нежно-зеленый
-            'гибкость': (0.96, 0.96, 0.80, 0.7),    # Нежно-желтый
-            'координация': (0.92, 0.80, 0.96, 0.7), # Нежно-сиреневый
-            'прикладное': (0.80, 0.96, 0.96, 0.7),    # Нежно-бирюзовый
-            'скорость-сила': (0.86, 0.86, 0.70, 0.7) # Грязный желтый
+            'сила': (0.96, 0.80, 0.80, 0.7),
+            'скорость': (0.80, 0.84, 0.96, 0.7),
+            'выносливость': (0.80, 0.96, 0.84, 0.7),
+            'гибкость': (0.96, 0.96, 0.80, 0.7),
+            'координация': (0.92, 0.80, 0.96, 0.7),
+            'прикладное': (0.80, 0.96, 0.96, 0.7),
+            'скорость-сила': (0.86, 0.86, 0.70, 0.7)
         }
-        return category_colors.get(self.category.lower(), (0.98, 0.98, 0.98, 1))  # Почти белый по умолчанию
+        return category_colors.get(self.category.lower(), (0.98, 0.98, 0.98, 1))
 
     def refresh_view_attrs(self, rv, index, data):
         self.index = index
@@ -212,21 +208,6 @@ class MainScreen(Screen):
             for item in standards
         ]
 
-# class TrackerScreen(Screen):
-#     def on_enter(self):
-#         """Обновляем данные трекера при открытии экрана"""
-#         from modules.tracker import get_progress_data
-#         progress = get_progress_data()
-#         self.ids.progress_container.clear_widgets()
-#         for exercise, data in progress.items():
-#             self.ids.progress_container.add_widget(
-#                 ProgressItem(
-#                     exercise=exercise,
-#                     current=data['current'],
-#                     best=data['best'],
-#                     norm=data['norm']
-#                 )
-#             )
 
 
 class NotebookEntry(BoxLayout):

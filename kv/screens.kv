@@ -161,7 +161,7 @@
             size_hint_y: None
             height: dp(40)
             spacing: dp(2)
-            padding: dp(4)
+            padding: [dp(4), dp(4)]
             canvas.before:
                 Color:
                     rgba: 0.12, 0.36, 0.46, 1  # Темно-синий
@@ -170,41 +170,55 @@
                     size: self.size
                     radius: [dp(8), dp(8), 0, 0]
 
+            # Упражнение
             Label:
                 text: 'Упражнение'
+                size_hint_x: 0.5
                 color: 1, 1, 1, 1
                 bold: True
-                size_hint_x: 0.45
-                halign: 'left'
                 font_size: '14sp'
+                halign: 'left'
+                valign: 'middle'
+                text_size: self.width, None
+                padding: [dp(8), 0]
 
+            # Нормативы (уменьшенные колонки)
             Label:
                 text: 'Золото'
+                size_hint_x: 0.15
                 color: 1, 1, 1, 1
                 bold: True
+                font_size: '12sp'
                 halign: 'center'
-                font_size: '14sp'
+                valign: 'middle'
 
             Label:
                 text: 'Серебро'
+                size_hint_x: 0.15
                 color: 1, 1, 1, 1
                 bold: True
+                font_size: '12sp'
                 halign: 'center'
-                font_size: '14sp'
+                valign: 'middle'
 
             Label:
                 text: 'Бронза'
+                size_hint_x: 0.15
                 color: 1, 1, 1, 1
                 bold: True
+                font_size: '12sp'
                 halign: 'center'
-                font_size: '14sp'
+                valign: 'middle'
 
+            # Единицы измерения
             Label:
                 text: 'Ед.изм.'
+                size_hint_x: 0.1
                 color: 1, 1, 1, 1
                 bold: True
+                font_size: '11sp'
                 halign: 'right'
-                font_size: '14sp'
+                valign: 'middle'
 
         # Таблица с нормативами
         ScrollView:
@@ -218,12 +232,12 @@
                 viewclass: 'StandardItem'
                 RecycleGridLayout:
                     cols: 1
-                    default_size: None, dp(60)
+                    default_size: None, dp(60)  # Минимальная высота строки
                     default_size_hint: (1, None)
                     size_hint_y: None
                     height: self.minimum_height
-                    spacing: dp(4)
-                    padding: [dp(4), dp(4)]
+                    spacing: dp(2)  # Уменьшенный отступ между строками
+                    padding: [dp(4), 0]  # Боковые отступы
 
         # Подсказка по категориям
         BoxLayout:
@@ -370,43 +384,71 @@
 <StandardItem>:
     cols: 5
     size_hint_y: None
-    height: dp(60)
-    padding: [dp(5), dp(5)]
-    spacing: dp(5)
+    height: self.minimum_height  # Автоматическая высота по содержимому
+    padding: [dp(8), dp(4)]
+    spacing: dp(4)
+    canvas.before:
+        Color:
+            rgba: self.get_category_color()
+        Rectangle:
+            pos: self.pos
+            size: self.size
 
-
+    # Название упражнения (теперь с переносом текста)
     Label:
         text: root.exercise
-        size_hint_x: 0.45
+        size_hint_x: 0.5  # Больше места для названия
         text_size: self.width, None
         halign: 'left'
         valign: 'middle'
-        padding: (dp(5), 0)
+        padding: [dp(8), dp(4)]
         color: 0, 0, 0, 1
+        font_size: '14sp'
+        size_hint_y: None
+        height: self.texture_size[1]  # Авто-высота по тексту
+        multiline: True  # Разрешить перенос текста
 
+    # Нормативы (золото/серебро/бронза) - уменьшенные колонки
     Label:
         text: root.gold
+        size_hint_x: 0.15
         halign: 'center'
         valign: 'middle'
+        font_size: '13sp'
         color: 0.9, 0.7, 0.0, 1  # Золотой
+        size_hint_y: None
+        height: max(dp(20), self.texture_size[1])
 
     Label:
         text: root.silver
+        size_hint_x: 0.15
         halign: 'center'
         valign: 'middle'
+        font_size: '13sp'
         color: 0.72, 0.72, 0.75, 1  # Серебряный
+        size_hint_y: None
+        height: max(dp(20), self.texture_size[1])
 
     Label:
         text: root.bronze
+        size_hint_x: 0.15
         halign: 'center'
         valign: 'middle'
+        font_size: '13sp'
         color: 0.85, 0.6, 0.2, 1  # Бронзовый
+        size_hint_y: None
+        height: max(dp(20), self.texture_size[1])
 
+    # Единицы измерения
     Label:
         text: root.unit
+        size_hint_x: 0.1
         halign: 'right'
         valign: 'middle'
-        color: 0, 0, 0, 1
+        font_size: '11sp'
+        color: 0.4, 0.4, 0.4, 1  # Серый
+        size_hint_y: None
+        height: max(dp(20), self.texture_size[1])
 
 
 <NotebookEntry>:

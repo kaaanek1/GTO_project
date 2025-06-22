@@ -10,7 +10,7 @@ def get_standards_for_stage(stage: int, gender: str) -> List[Dict]:
     SELECT exercise, gold, silver, bronze, unit, category
     FROM standards 
     WHERE stage = ? AND gender = ?
-    ORDER BY exercise
+    ORDER BY category
     """
     cursor.execute(query, (stage, gender))
     standards = cursor.fetchall()
