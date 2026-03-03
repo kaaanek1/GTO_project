@@ -16,15 +16,17 @@ jobs:
       - name: Build with Buildozer
         run: |
           export PATH=$PATH:$HOME/.local/bin
-      
-          mkdir -p $HOME/.buildozer/android/platform/android-sdk/licenses
           
-          echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb743402295581237459\n24333f8a63b6825ea9c5573f435157a807233563" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          mkdir -p $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
           
-          export BUILDOZER_ALLOW_ORG_TEST_DOMAIN=1
+          cd $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
+          curl -O https://dl.google.com
+          unzip -q commandlinetools-linux-9477386_latest.zip
+          mv cmdline-tools latest
           
-          buildozer android debug
+          yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses || true
           
+          cd $GITHUB_WORKSPACE
           buildozer android debug
 
       - name: Upload APK
