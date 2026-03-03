@@ -25,5 +25,4 @@ jobs:
       - name: Build with Buildozer
         run: |
           export PATH=$PATH:$HOME/.local/bin
-          yes | sdkmanager --licenses || true
-          buildozer android debug
+          buildozer android debug --accept-sdk-license
