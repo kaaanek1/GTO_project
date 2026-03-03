@@ -26,3 +26,11 @@ jobs:
         run: |
           export PATH=$PATH:$HOME/.local/bin
           buildozer android debug --accept-sdk-license
+          
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: "**/*.apk"
+
+      
