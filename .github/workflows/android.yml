@@ -20,11 +20,13 @@ jobs:
           mkdir -p $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
           
           cd $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
-          curl -O https://dl.google.com
-          unzip -q commandlinetools-linux-9477386_latest.zip
-          mv cmdline-tools latest
+          curl -L -o commandlinetools.zip https://dl.google.com
+          unzip -q commandlinetools.zip
           
-          yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses || true
+          mkdir -p latest
+          mv cmdline-tools/* latest/ || true
+          
+          yes | ./latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses || true
           
           cd $GITHUB_WORKSPACE
           buildozer android debug
