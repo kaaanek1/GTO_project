@@ -1,13 +1,22 @@
 name: Build APK
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-22.04 # Используем стабильную версию Ubuntu
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Buildozer dependencies
         run: |
           sudo apt update
           sudo apt install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
@@ -16,23 +25,5 @@ jobs:
       - name: Build with Buildozer
         run: |
           export PATH=$PATH:$HOME/.local/bin
-          
-          mkdir -p $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
-          
-          cd $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
-          curl -L -o commandlinetools.zip https://dl.google.com
-          unzip -q commandlinetools.zip
-          
-          mkdir -p latest
-          mv cmdline-tools/* latest/ || true
-          
-          yes | ./latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses || true
-          
-          cd $GITHUB_WORKSPACE
+          yes | sdkmanager --licenses || true
           buildozer android debug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: package
-          path: bin/*.apk
