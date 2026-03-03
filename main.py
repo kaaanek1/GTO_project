@@ -14,9 +14,13 @@ from kivy.storage.jsonstore import JsonStore
 from kivy.uix.recycleview import RecycleView
 from datetime import  datetime
 from kivy.metrics import dp
+from kivy.utils import platform
 
 # Установим размер окна для удобства разработки
-Window.size = (360, 640)
+if platform != 'android':
+    Window.size = (360, 640)
+else:
+    Window.softinput_mode = 'below_target'
 
 # Загружаем KV-файл с интерфейсом
 Builder.load_file("kv/screens.kv")
@@ -131,8 +135,15 @@ class RegistrationScreen(Screen):
 
     def register_user(self):
         name = self.name_input.text.strip()
-        age = int(self.age_input.text)
+        age_text = self.age_input.text.strip()
+        if not name or not age_text.isdigit() or self.gender_spinner.text not in ('Male', 'Female'):
+            return
+
+        age = int(age_text)
         stage = self.get_user_stage(age)
+        if stage is None:
+            return
+
         gender = self.gender_spinner.text.lower()  # Приводим к нижнему регистру
 
         user_data = {
