@@ -107,7 +107,7 @@ android.api = 33
 #android.minapi = 21
 
 # (int) Android SDK version to use
-android.sdk = 33
+#android.sdk = 33
 
 android.build_tools_version = 33.0.0
 
