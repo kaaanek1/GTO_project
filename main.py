@@ -1,3 +1,10 @@
+import os
+
+from kivy.config import Config
+
+if 'ANDROID_ARGUMENT' in os.environ:
+    Config.set('kivy', 'keyboard_mode', 'system')
+
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.lang import Builder
@@ -20,7 +27,7 @@ from kivy.utils import platform
 if platform != 'android':
     Window.size = (360, 640)
 else:
-    Window.softinput_mode = 'below_target'
+    Window.softinput_mode = 'pan'
 
 # Загружаем KV-файл с интерфейсом
 Builder.load_file("kv/screens.kv")
